@@ -36,8 +36,8 @@ namespace Battleship
 
             Random rnd = new Random();
             bool[,] battleship = new bool[8, 8];
-            bool[,] screen = new bool[8, 8];
-            const int totalShips = 8;
+            int[,] screen = new int[8, 8];
+            const int totalShips = 4;
             int shipCnt = 0;
             int hits = 0;
 
@@ -47,19 +47,47 @@ namespace Battleship
                 for (int y = 0; y < 8; y++)
 
                 {
-                    if (totalShips > shipCnt)
-                    {
-                        battleship[x, y] = (rnd.Next(2) == 0);
-                        if (battleship[x, y])
+                    battleship[x, y] = false;
+                    screen[x, y] = 0;
+                }
+            }
+
+
+            for(int x = 0; x <totalShips; x++) //paint battleships
+            {
+                int shipLngth = rnd.Next(6)+1;
+                int dir = rnd.Next(2);
+                int xStart = rnd.Next(8);
+                int yStart = rnd.Next(8);
+                Console.WriteLine("sl" + shipLngth + " dir" + dir + " x" + xStart + " y" + yStart);
+                switch (dir) //paint ships
+                {
+                    case 0: //means we're going down
+                        if((yStart + shipLngth )> 7)
                         {
-                            shipCnt++;
+                            Console.WriteLine("breaky");
+                            x--;
+                            break;
                         }
-                    }
-                    else
-                    {
-                        battleship[x, y] = false;
-                    }
-                    screen[x, y] = false;
+                        for(int i = yStart;i < yStart+shipLngth;i++)//put ship in array
+                        {
+                            battleship[i, yStart] = true;
+                        }
+                        break;
+                    case 1: //means we're going down
+                        if ((xStart + shipLngth) > 7)
+                        {
+                            Console.WriteLine("breakx");
+                            x--;
+                            break;
+                        }
+                        for (int i = xStart; i < xStart + shipLngth; i++)//put ship in array
+                        {
+                            battleship[xStart, i] = true;                           
+                        }
+                        break;
+
+
                 }
             }
 
@@ -69,6 +97,7 @@ namespace Battleship
             while (keepgoing)
             {
                 keepgoing = true;
+                /**
                 for (int x = 0; x < 8; x++)
                 {
                     Console.WriteLine();
@@ -85,6 +114,32 @@ namespace Battleship
                         }
 
                     }
+                }**/
+                Console.Clear();
+                Console.WriteLine("  0 1 2 3 4 5 6 7");
+                for (int x = 0; x < 8; x++)
+                {
+                    Console.WriteLine();
+                    Console.Write(x + " ");
+                   
+                    for (int y = 0; y < 8; y++)
+
+                    {  
+                        
+                       switch(screen[x,y])
+                        {
+                            case 0:
+                                Console.Write("^ ");//water
+                                break;
+                            case 1:
+                                Console.Write("X ");//hit
+                                break;
+                            case 2:
+                                Console.Write("O ");
+                                break;
+                        };
+                    }
+                    Console.WriteLine();
                 }
                 Console.WriteLine("\n");
                 Console.WriteLine("Please type an 'x' coordinate.");
@@ -109,13 +164,14 @@ namespace Battleship
                 {
                     Console.WriteLine("you hit my battleship, you win!!");
                     battleship[xSpace, ySpace] = false;
-                    screen[xSpace, ySpace] = true;
+                    screen[xSpace, ySpace] = 1;
                     if (++hits == shipCnt) keepgoing = false;
 
                 }
                 else
                 {
                     Console.WriteLine("you lose");
+                    screen[xSpace, ySpace] = 2;
                 }
                 Console.WriteLine("Do you want to keep going? \n[y]es\n[n]o");
                 answer = Console.ReadLine();
