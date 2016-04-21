@@ -8,6 +8,28 @@ namespace Battleship
 {
     class Program
     {
+
+        /// <summary>
+        /// getInt()
+        /// grabs a non negative integer from the User through the Console
+        /// </summary>
+        /// <param name="prompt">Takes a String to display to User before readline</param>
+        /// <returns>non Negative integer</returns>
+        static int GetInt(string prompt)
+        {
+            int result = -1;
+            string response = "";
+            do
+            {
+                Console.Write(prompt);
+                response = Console.ReadLine();
+
+            } while (!int.TryParse(response, out result));
+            return result;
+        }
+
+
+
         static void Main(string[] args)
         {
 
@@ -69,10 +91,16 @@ namespace Battleship
                             x--;
                             break;
                         }
-                        for(int i = yStart;i < yStart+shipLngth;i++)//put ship in array
+                        for (int i = yStart; i < yStart + shipLngth; i++)//check for collision
                         {
-                            battleship[i, yStart] = true;
+                            if (battleship[i, yStart]) break;
                         }
+                       
+                            for (int i = yStart; i < yStart + shipLngth; i++)//put ship in array
+                            {
+                                battleship[i, yStart] = true;
+                            }
+                        
                         break;
                     case 1: //means we're going down
                         if ((xStart + shipLngth) > 7)
@@ -80,6 +108,10 @@ namespace Battleship
                             Console.WriteLine("breakx");
                             x--;
                             break;
+                        }
+                        for (int i = xStart; i < xStart + shipLngth; i++)//check for collision
+                        {
+                            if (battleship[yStart, i]) break;
                         }
                         for (int i = xStart; i < xStart + shipLngth; i++)//put ship in array
                         {
@@ -97,7 +129,7 @@ namespace Battleship
             while (keepgoing)
             {
                 keepgoing = true;
-                /**
+                
                 for (int x = 0; x < 8; x++)
                 {
                     Console.WriteLine();
@@ -114,7 +146,8 @@ namespace Battleship
                         }
 
                     }
-                }**/
+                }
+                Console.ReadLine();
                 Console.Clear();
                 Console.WriteLine("  0 1 2 3 4 5 6 7");
                 for (int x = 0; x < 8; x++)
@@ -142,22 +175,19 @@ namespace Battleship
                     Console.WriteLine();
                 }
                 Console.WriteLine("\n");
-                Console.WriteLine("Please type an 'x' coordinate.");
-                string answer = Console.ReadLine();
-                int xSpace;
-                while (!int.TryParse(answer, out xSpace) || ((xSpace < 0) || (xSpace >= 8)))
+                int xSpace = GetInt("Enter Y Coordinate:");              
+                while  ((xSpace < 0) || (xSpace >= 8))
                 {
-                    Console.WriteLine("Not a number or out of range. Enter a number between 0-8. Try again!");
-                    answer = Console.ReadLine();
+                    
+                    xSpace = GetInt("Out of range. Enter a number between 0-7. Try again!");
+                    
                 }
 
-                Console.WriteLine("Please type a 'y' coordinate.");
-                answer = Console.ReadLine();
-                int ySpace;
-                while (!int.TryParse(answer, out ySpace) || ((ySpace < 0) || (ySpace >= 8)))
+                int ySpace = GetInt("Please type a 'X' coordinate.");
+                
+                while (((ySpace < 0) || (ySpace >= 8)))
                 {
-                    Console.WriteLine("Not a number or out of range. Enter a number between 0-7. Try again!");
-                    answer = Console.ReadLine();
+                   ySpace = GetInt("Out of range. Enter a number between 0-7. Try again!");
                 }
 
                 if (battleship[xSpace, ySpace] == true)
@@ -170,11 +200,11 @@ namespace Battleship
                 }
                 else
                 {
-                    Console.WriteLine("you lose");
+                    Console.WriteLine("you missed!");
                     screen[xSpace, ySpace] = 2;
                 }
                 Console.WriteLine("Do you want to keep going? \n[y]es\n[n]o");
-                answer = Console.ReadLine();
+                string answer = Console.ReadLine();
                 switch (answer.ToLower())
                 {
                     case "y":
