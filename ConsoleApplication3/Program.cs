@@ -109,9 +109,62 @@ namespace Battleship
                 }
             }
             return ships;
-            
+
         }
 
+        static bool[,] LoadShipsFromFile(bool[,] ships, string path = @".\board1.lvl")
+        {
+            string[] splitFile;
+            string temp = "";
+            string myFile = System.IO.File.ReadAllText(path);
+            splitFile = myFile.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None); // split file on newlines
+            Console.ReadLine();
+            for (int rows = 0; rows < 8; rows++)
+            {
+                temp = splitFile[rows];
+                for (int col = 0; col < 8; col++)
+                {
+                    if(temp[col] == '1')
+                    {
+                        ships[rows, col] = true;
+                    }
+
+                }
+            }
+            return ships;
+        }
+
+
+
+        static void PaintScreen(int[,] screen)
+        {
+            Console.Clear();
+            Console.WriteLine("  0 1 2 3 4 5 6 7");
+            for (int x = 0; x < 8; x++)
+            {
+                Console.WriteLine();
+                Console.Write(x + " ");
+
+                for (int y = 0; y < 8; y++)
+
+                {
+
+                    switch (screen[x, y])
+                    {
+                        case 0:
+                            Console.Write("^ ");//water
+                            break;
+                        case 1:
+                            Console.Write("X ");//hit
+                            break;
+                        case 2:
+                            Console.Write("O ");
+                            break;
+                    };
+                }
+                Console.WriteLine();
+            }
+        }
         static void Main(string[] args)
         {
 
@@ -137,15 +190,15 @@ namespace Battleship
 
             // If user picks a cell next to a ship, say "close!"
 
-            
+
             bool[,] battleship = new bool[8, 8];
             int[,] screen = new int[8, 8];
             const int totalShips = 3;
             int shipCnt = 0;
-            int hits = 0;            
+            int hits = 0;
             init(battleship, screen);
-            battleship = (LoadShips(battleship, 4));
-            
+            //battleship = (LoadShips(battleship, 4));
+            battleship = (LoadShipsFromFile(battleship));
 
 
             //Making a game loop after "lose"
@@ -172,32 +225,8 @@ namespace Battleship
                     }
                 }
                 Console.ReadLine();
-                Console.Clear();
-                Console.WriteLine("  0 1 2 3 4 5 6 7");
-                for (int x = 0; x < 8; x++)
-                {
-                    Console.WriteLine();
-                    Console.Write(x + " ");
+                PaintScreen(screen);
 
-                    for (int y = 0; y < 8; y++)
-
-                    {
-
-                        switch (screen[x, y])
-                        {
-                            case 0:
-                                Console.Write("^ ");//water
-                                break;
-                            case 1:
-                                Console.Write("X ");//hit
-                                break;
-                            case 2:
-                                Console.Write("O ");
-                                break;
-                        };
-                    }
-                    Console.WriteLine();
-                }
                 Console.WriteLine("\n");
                 int xSpace = GetInt("Enter Y Coordinate:");
                 while ((xSpace < 0) || (xSpace >= 8))
