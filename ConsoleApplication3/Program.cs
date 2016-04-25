@@ -29,12 +29,93 @@ namespace Battleship
         }
 
 
+        /// <summary>
+        /// initializes the ships and screen array to all false and 0's respectfully
+        /// </summary>
+        /// <param name="ships">boolean array</param>
+        /// <param name="screen">int array</param>
+        static void init(bool[,] ships, int[,] screen)
+        {
+            for (int x = 0; x < 8; x++) //initialize ships and screen
+            {
+                for (int y = 0; y < 8; y++)
+
+                {
+                    ships[x, y] = false;
+                    screen[x, y] = 0;
+                }
+            }
+        }
+
+
+        static bool[,] LoadShips(bool[,] ships, int totalShips = 1)
+        {
+            Random rnd = new Random();
+            for (int incr = 0; incr < totalShips; incr++) //load battleships
+            {
+                int shipLngth = rnd.Next(6) + 2;
+                int dir = rnd.Next(2);
+                int xStart = rnd.Next(8);
+                int yStart = rnd.Next(8);
+                Console.WriteLine("sl" + shipLngth + " dir" + dir + " x" + yStart + " y" + xStart);
+                switch (dir) //paint ships
+                {
+                    case 0: //means we're going right
+                        if ((yStart + shipLngth) > 7)
+                        {
+                            Console.WriteLine("breaky");
+                            incr--; //make sure that incr doesn't go up
+                            break;
+                        }
+                        for (int i = yStart; i < yStart + shipLngth; i++)//check for collision
+                        {
+                            if (ships[xStart, i])
+                            {
+                                Console.WriteLine("collide y");
+                                incr--;
+                                break;
+                            }
+                        }
+
+                        for (int i = yStart; i < yStart + shipLngth; i++)//put ship in array
+                        {
+                            ships[xStart, i] = true;
+                        }
+
+                        break;
+                    case 1: //means we're going down
+                        if ((xStart + shipLngth) > 7)
+                        {
+                            Console.WriteLine("breakx");
+                            incr--; //make sure incr doesn't increment this round
+                            break;
+                        }
+                        for (int i = xStart; i < xStart + shipLngth; i++)//check for collision
+                        {
+                            if (ships[i, yStart])
+                            {
+                                Console.WriteLine("collide x");
+                                incr--;
+                                break;
+                            }
+                        }
+                        for (int i = xStart; i < xStart + shipLngth; i++)//put ship in array
+                        {
+                            ships[i, yStart] = true;
+                        }
+                        break;
+
+
+                }
+            }
+            return ships;
+            
+        }
 
         static void Main(string[] args)
         {
 
-            //Create a grid(an array with two dimensions) that is 8 by 8.
-
+            //Create a grid(an array with two dimensions) that is 8 by 8
             //This grid will hold whether there is a ship in a given square or not.You can use a bool or an int for this.You will need to be able to display this grid, with
             //00000000
             //0000*000
@@ -56,72 +137,15 @@ namespace Battleship
 
             // If user picks a cell next to a ship, say "close!"
 
-            Random rnd = new Random();
+            
             bool[,] battleship = new bool[8, 8];
             int[,] screen = new int[8, 8];
-            const int totalShips = 4;
+            const int totalShips = 3;
             int shipCnt = 0;
-            int hits = 0;
-
-
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-
-                {
-                    battleship[x, y] = false;
-                    screen[x, y] = 0;
-                }
-            }
-
-
-            for(int x = 0; x <totalShips; x++) //paint battleships
-            {
-                int shipLngth = rnd.Next(6)+1;
-                int dir = rnd.Next(2);
-                int xStart = rnd.Next(8);
-                int yStart = rnd.Next(8);
-                Console.WriteLine("sl" + shipLngth + " dir" + dir + " x" + xStart + " y" + yStart);
-                switch (dir) //paint ships
-                {
-                    case 0: //means we're going down
-                        if((yStart + shipLngth )> 7)
-                        {
-                            Console.WriteLine("breaky");
-                            x--;
-                            break;
-                        }
-                        for (int i = yStart; i < yStart + shipLngth; i++)//check for collision
-                        {
-                            if (battleship[i, yStart]) break;
-                        }
-                       
-                            for (int i = yStart; i < yStart + shipLngth; i++)//put ship in array
-                            {
-                                battleship[i, yStart] = true;
-                            }
-                        
-                        break;
-                    case 1: //means we're going down
-                        if ((xStart + shipLngth) > 7)
-                        {
-                            Console.WriteLine("breakx");
-                            x--;
-                            break;
-                        }
-                        for (int i = xStart; i < xStart + shipLngth; i++)//check for collision
-                        {
-                            if (battleship[yStart, i]) break;
-                        }
-                        for (int i = xStart; i < xStart + shipLngth; i++)//put ship in array
-                        {
-                            battleship[xStart, i] = true;                           
-                        }
-                        break;
-
-
-                }
-            }
+            int hits = 0;            
+            init(battleship, screen);
+            battleship = (LoadShips(battleship, 4));
+            
 
 
             //Making a game loop after "lose"
@@ -129,7 +153,7 @@ namespace Battleship
             while (keepgoing)
             {
                 keepgoing = true;
-                
+
                 for (int x = 0; x < 8; x++)
                 {
                     Console.WriteLine();
@@ -154,12 +178,12 @@ namespace Battleship
                 {
                     Console.WriteLine();
                     Console.Write(x + " ");
-                   
+
                     for (int y = 0; y < 8; y++)
 
-                    {  
-                        
-                       switch(screen[x,y])
+                    {
+
+                        switch (screen[x, y])
                         {
                             case 0:
                                 Console.Write("^ ");//water
@@ -175,19 +199,19 @@ namespace Battleship
                     Console.WriteLine();
                 }
                 Console.WriteLine("\n");
-                int xSpace = GetInt("Enter Y Coordinate:");              
-                while  ((xSpace < 0) || (xSpace >= 8))
+                int xSpace = GetInt("Enter Y Coordinate:");
+                while ((xSpace < 0) || (xSpace >= 8))
                 {
-                    
+
                     xSpace = GetInt("Out of range. Enter a number between 0-7. Try again!");
-                    
+
                 }
 
                 int ySpace = GetInt("Please type a 'X' coordinate.");
-                
+
                 while (((ySpace < 0) || (ySpace >= 8)))
                 {
-                   ySpace = GetInt("Out of range. Enter a number between 0-7. Try again!");
+                    ySpace = GetInt("Out of range. Enter a number between 0-7. Try again!");
                 }
 
                 if (battleship[xSpace, ySpace] == true)
@@ -231,4 +255,3 @@ namespace Battleship
     }
 }
 
-    
